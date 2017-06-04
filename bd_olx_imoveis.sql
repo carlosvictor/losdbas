@@ -2,7 +2,7 @@
 CREATE TYPE tp_fone AS OBJECT(
 cod INTEGER,
 numero INTEGER,
-MEMBER PROCEDURE exibe_fone (SELF tp-fone)
+MEMBER PROCEDURE exibe_fone (SELF tp_fone)
 );
 /
 #tipo endereço
@@ -35,10 +35,20 @@ ALTER TYPE tp_funcionario ADD ATTRIBUTE(supervisor REF tp_funcionario) CASCADE;
 
 #tabela funcionario
 CREATE TABLE tb_funcionario OF tp_funcionario(
-	cod PRIMARY KEY,
-	nome NOT NULL,
-	supervisor SCOPE IS tb_funcionario
+	cod PRIMARY KEY
 );
+
+#inserindo valor à tabela funcionario
+INSERT INTO tb_funcionario VALUES(
+	'func123',
+	'fulano', 
+	'fulano@cicrano.com',
+	TO_DATE('10-10-1980','DD-MM-YYYY'),
+	TO_DATE('03-03-2005','DD-MM-YYYY'),
+	tp_fone(81,99999999),
+	tp_endereco(54400000,'tal de alguma coisa',20,'bl.02 ap302','Esse bairro','raincife','pe')
+);
+
 
 
 
