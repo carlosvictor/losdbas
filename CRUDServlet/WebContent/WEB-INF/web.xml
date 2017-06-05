@@ -4,22 +4,22 @@
   
    <context-param>
         <param-name>jdbcURL</param-name>
-        <param-value>jdbc:mysql://localhost:3306/livraria</param-value>
+        <param-value>jdbc:oracle:thin:@localhost:49161:xe</param-value>
     </context-param>
  
     <context-param>
         <param-name>jdbcUsername</param-name>
-        <param-value>root</param-value>
+        <param-value>system</param-value>
     </context-param>
  
     <context-param>
         <param-name>jdbcPassword</param-name>
-        <param-value></param-value>
+        <param-value>oracle</param-value>
     </context-param>
  
     <servlet>
         <servlet-name>ControllerServlet</servlet-name>
-        <servlet-class>br.com.livraria.controller.ControllerServlet</servlet-class>
+        <servlet-class>br.com.olximoveis.controller.ControllerServlet</servlet-class>
     </servlet>
  
     <servlet-mapping>
@@ -39,6 +39,6 @@
     </error-page>
     
     <listener>
-        <listener-class>br.com.livraria.listener.AppContextListener</listener-class>
+        <listener-class>br.com.olximoveis.listener.AppContextListener</listener-class>
     </listener>
 </web-app>

@@ -1,4 +1,4 @@
-package br.com.livraria.model;
+package br.com.olximoveis.model;
 
 public class Livro {
 	

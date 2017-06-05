@@ -1,8 +1,11 @@
-package br.com.livraria.controller;
+package br.com.olximoveis.controller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,12 +13,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import br.com.livraria.dao.LivroDAO;
-import br.com.livraria.model.Livro;
+import br.com.olximoveis.dao.FuncionarioDAO;
+import br.com.olximoveis.dao.LivroDAO;
+import br.com.olximoveis.model.Endereco;
+import br.com.olximoveis.model.Funcionario;
+import br.com.olximoveis.model.Livro;
+import br.com.olximoveis.model.Telefone;
+import br.com.olximoveis.utils.Utils;
 
 public class ControllerServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private LivroDAO livroDAO;
+    private FuncionarioDAO funcionarioDAO;
  
     public void init() {
         String jdbcURL = getServletContext().getInitParameter("jdbcURL");
@@ -23,6 +32,7 @@ public class ControllerServlet extends HttpServlet {
         String jdbcPassword = getServletContext().getInitParameter("jdbcPassword");
  
         livroDAO = new LivroDAO(jdbcURL, jdbcUsername, jdbcPassword);
+        funcionarioDAO = new FuncionarioDAO();
  
     }
  
@@ -56,43 +66,66 @@ public class ControllerServlet extends HttpServlet {
                 listarLivros(request, response);
                 break;
             }
-        } catch (SQLException ex) {
+        } catch (SQLException | ParseException ex) {
             throw new ServletException(ex);
         }
     }
  
     private void listarLivros(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException, ServletException {
-        List<Livro> listaLivros = livroDAO.listarLivros();
-        request.setAttribute("listaLivros", listaLivros);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("listaLivros.jsp");
+    	List<Funcionario> funcionarios = funcionarioDAO.listar();
+    	request.setAttribute("funcionarios", funcionarios);
+    			
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/funcionarios/lista.jsp");
         dispatcher.forward(request, response);
     }
  
     private void mostrarFormularioNovo(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("formulario.jsp");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/funcionarios/formulario.jsp");
         dispatcher.forward(request, response);
     }
  
     private void mostrarFormularioEditar(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, ServletException, IOException {
-        Integer id = Integer.parseInt(request.getParameter("id"));
-        Livro livro = livroDAO.buscarLivroPorId(id);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("formulario.jsp");
-        request.setAttribute("livro", livro);
+        Funcionario funcionario = funcionarioDAO.buscarPorId(request.getParameter("id"));
+        
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/funcionarios/formulario.jsp");
+        request.setAttribute("funcionario", funcionario);
         dispatcher.forward(request, response);
  
     }
  
     private void salvarLivro(HttpServletRequest request, HttpServletResponse response)
-            throws SQLException, IOException {
-        String titulo = request.getParameter("titulo");
-        String autor = request.getParameter("autor");
-        Float preco = Float.parseFloat(request.getParameter("preco"));
- 
-        Livro livro = new Livro(titulo, autor, preco);
-        livroDAO.salvarLivro(livro);
+            throws SQLException, IOException, ParseException {
+
+    	// funcionario
+    	String cod = UUID.randomUUID().toString().substring(0,10);
+        String nome = request.getParameter("nome");
+        String email = request.getParameter("email");
+        String dataNascimentoStr = request.getParameter("data_nascimento");
+        Date dataNascimento = Utils.Date.FORMATADOR_DEFAULT.parse(dataNascimentoStr);
+        Date dataAdmissao = new Date();
+        
+        // telefone 
+        Integer codTelefone = Integer.parseInt(request.getParameter("telefone.cod"));
+        Integer numeroTelefone = Integer.parseInt(request.getParameter("telefone.numero"));
+        Telefone telefone = new Telefone(codTelefone, numeroTelefone);
+        
+        // endereco
+        Integer cep = Integer.parseInt(request.getParameter("endereco.cep"));
+        String rua = request.getParameter("endereco.rua");
+        Integer numero = Integer.parseInt(request.getParameter("endereco.numero"));
+        String complemento = request.getParameter("endereco.complemento");
+        String bairro = request.getParameter("endereco.bairro");
+        String cidade = request.getParameter("endereco.cidade");
+        String estado = request.getParameter("endereco.estado");
+        Endereco endereco = new Endereco(cep, rua, numero, complemento, bairro, cidade, estado);
+        
+        Funcionario funcionario = new Funcionario(cod, nome, email, dataNascimento, dataAdmissao, telefone, endereco, null);
+        
+        funcionarioDAO.salvar(funcionario);
+        
         response.sendRedirect("listar");
     }
  
@@ -110,10 +143,8 @@ public class ControllerServlet extends HttpServlet {
  
     private void deletarLivro(HttpServletRequest request, HttpServletResponse response)
             throws SQLException, IOException {
-        Integer id = Integer.parseInt(request.getParameter("id"));
- 
-        Livro livro = new Livro(id);
-        livroDAO.deletarLivro(livro);
+    	
+        funcionarioDAO.deletarPorId(request.getParameter("id"));
         response.sendRedirect("listar");
  
     }

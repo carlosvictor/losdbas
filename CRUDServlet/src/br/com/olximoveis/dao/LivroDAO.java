@@ -1,4 +1,4 @@
-package br.com.livraria.dao;
+package br.com.olximoveis.dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,7 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import br.com.livraria.model.Livro;
+import br.com.olximoveis.model.Livro;
 
 public class LivroDAO {
 	private String jdbcURL;
@@ -25,7 +25,7 @@ public class LivroDAO {
     protected void connect() throws SQLException {
         if (jdbcConnection == null || jdbcConnection.isClosed()) {
             try {
-                Class.forName("com.mysql.jdbc.Driver");
+                Class.forName("oracle.jdbc.driver.OracleDriver");
             } catch (ClassNotFoundException e) {
                 throw new SQLException(e);
             }
