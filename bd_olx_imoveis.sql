@@ -91,6 +91,10 @@ CREATE TABLE tb_clientepj OF tp_pjuridica;
 --tabela cliente pessoa fisica
 CREATE TABLE tb_clientepf OF tp_pfisica;
 
+--tipo imagens como varray
+CREATE TYPE imagens AS VARRAY(10) OF VARCHAR(255);
+
+
 -- tipo imovel
 CREATE TYPE tp_imovel AS OBJECT(
 	cod INTEGER,
